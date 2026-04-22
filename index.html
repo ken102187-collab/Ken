@@ -1,760 +1,283 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="我的資產">
-<meta name="theme-color" content="#0f172a">
-<title>我的資產</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-
-<style>
-  :root {
-    --bg: #f8fafc;
-    --card: #ffffff;
-    --dark: #0f172a;
-    --accent: #2563eb;
-    --accent2: #7c3aed;
-    --emerald: #059669;
-    --amber: #d97706;
-    --slate: #64748b;
-    --border: #e2e8f0;
-    --text: #0f172a;
-    --text2: #64748b;
-    --text3: #cbd5e1;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-  body {
-    font-family: 'Noto Sans TC', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    min-height: -webkit-fill-available;
-    padding-bottom: calc(80px + env(safe-area-inset-bottom));
-    user-select: none;
-  }
-
-  /* Header */
-  .header {
-    background: rgba(255,255,255,0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border);
-    padding: 16px 20px;
-    padding-top: calc(16px + env(safe-area-inset-top));
-    position: sticky;
-    top: 0;
-    z-index: 50;
-  }
-  .header-inner {
-    max-width: 420px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .header-left { display: flex; align-items: center; gap: 8px; }
-  .back-btn {
-    width: 36px; height: 36px;
-    background: var(--bg);
-    border: none; border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; font-size: 18px; color: var(--slate);
-  }
-  .header h1 { font-size: 20px; font-weight: 900; }
-  .header-actions { display: flex; gap: 8px; }
-  .icon-btn {
-    width: 40px; height: 40px;
-    border: none; border-radius: 14px;
-    background: var(--bg);
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; font-size: 18px; color: var(--slate);
-    transition: all 0.15s;
-  }
-  .icon-btn:active { transform: scale(0.92); }
-  .icon-btn.primary { background: var(--accent); color: white; box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
-
-  /* Main content */
-  .main { max-width: 420px; margin: 0 auto; padding: 20px; }
-
-  /* Hero card */
-  .hero {
-    background: var(--dark);
-    border-radius: 32px;
-    padding: 32px 28px;
-    color: white;
-    position: relative;
-    overflow: hidden;
-    margin-bottom: 20px;
-  }
-  .hero::before {
-    content: '';
-    position: absolute;
-    top: -40%; right: -15%;
-    width: 220px; height: 220px;
-    background: radial-gradient(circle, rgba(37,99,235,0.4), transparent 70%);
-    border-radius: 50%;
-  }
-  .hero::after {
-    content: '';
-    position: absolute;
-    bottom: -30%; left: -10%;
-    width: 160px; height: 160px;
-    background: radial-gradient(circle, rgba(124,58,237,0.3), transparent 70%);
-    border-radius: 50%;
-  }
-  .hero-label { font-size: 10px; font-weight: 900; letter-spacing: 2px; color: rgba(255,255,255,0.4); margin-bottom: 6px; text-transform: uppercase; }
-  .hero-amount { font-size: 44px; font-weight: 900; letter-spacing: -2px; position: relative; z-index: 1; }
-  .hero-footer { margin-top: 24px; display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 1; }
-  .hero-btn {
-    background: rgba(255,255,255,0.12);
-    border: none; border-radius: 12px;
-    color: white; font-family: inherit;
-    font-size: 12px; font-weight: 700;
-    padding: 8px 14px; cursor: pointer;
-    display: flex; align-items: center; gap: 6px;
-    transition: all 0.15s;
-  }
-  .hero-btn:active { transform: scale(0.95); background: rgba(255,255,255,0.2); }
-  .fx-label { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.35); }
-
-  /* Grid */
-  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-  .cat-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 24px;
-    padding: 20px;
-    cursor: pointer;
-    transition: all 0.15s;
-    text-align: left;
-  }
-  .cat-card:active { transform: scale(0.96); box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-  .cat-icon {
-    width: 44px; height: 44px;
-    border-radius: 14px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 20px; margin-bottom: 14px;
-  }
-  .cat-label { font-size: 10px; font-weight: 900; letter-spacing: 1.5px; color: var(--text2); text-transform: uppercase; margin-bottom: 4px; }
-  .cat-amount { font-size: 18px; font-weight: 900; }
-
-  /* FX row */
-  .fx-row {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 16px 20px;
-    display: flex; align-items: center;
-    gap: 12px; margin-bottom: 20px;
-  }
-  .fx-row label { font-size: 12px; font-weight: 700; color: var(--text2); white-space: nowrap; }
-  .fx-row input {
-    flex: 1; border: none; background: var(--bg);
-    border-radius: 10px; padding: 8px 12px;
-    font-family: 'DM Mono', monospace; font-size: 15px; font-weight: 500;
-    color: var(--accent); outline: none; text-align: right;
-  }
-  .fx-hint { font-size: 10px; color: var(--text3); white-space: nowrap; }
-
-  /* Asset list */
-  .asset-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 18px 20px;
-    margin-bottom: 10px;
-    display: flex; justify-content: space-between; align-items: center;
-  }
-  .asset-name { font-weight: 900; font-size: 15px; }
-  .asset-symbol {
-    font-size: 10px; font-weight: 900;
-    background: var(--bg); color: var(--text2);
-    padding: 2px 8px; border-radius: 6px;
-    display: inline-block; margin-left: 6px; vertical-align: middle;
-    text-transform: uppercase;
-  }
-  .asset-sub { font-size: 11px; font-weight: 700; color: var(--text2); margin-top: 4px; }
-  .asset-right { text-align: right; }
-  .asset-twd-label { font-size: 10px; font-weight: 900; color: var(--text3); text-transform: uppercase; }
-  .asset-twd { font-size: 18px; font-weight: 900; }
-  .asset-actions { display: flex; gap: 8px; margin-top: 6px; justify-content: flex-end; }
-  .asset-action-btn {
-    background: none; border: none; cursor: pointer;
-    font-size: 14px; padding: 2px; color: var(--text3);
-    transition: color 0.15s;
-  }
-  .asset-action-btn:hover { color: var(--accent); }
-  .asset-action-btn.del:hover { color: #ef4444; }
-
-  /* Empty state */
-  .empty { text-align: center; padding: 48px 20px; color: var(--text3); }
-  .empty-icon { font-size: 48px; margin-bottom: 12px; }
-  .empty p { font-weight: 700; font-size: 14px; }
-
-  /* Chart */
-  .chart-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 28px;
-    padding: 28px 24px;
-  }
-  .chart-card h3 { font-weight: 900; margin-bottom: 24px; }
-  .chart-wrap { height: 220px; }
-
-  /* Bottom nav */
-  .bottom-nav {
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    background: rgba(255,255,255,0.92);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-top: 1px solid var(--border);
-    padding: 12px 20px;
-    padding-bottom: calc(12px + env(safe-area-inset-bottom));
-    display: flex; justify-content: space-around;
-    z-index: 40;
-  }
-  .nav-btn {
-    background: none; border: none;
-    display: flex; flex-direction: column;
-    align-items: center; gap: 4px;
-    cursor: pointer; font-family: inherit;
-    color: var(--text3); font-size: 10px;
-    font-weight: 700; transition: all 0.15s;
-    padding: 4px 8px; border-radius: 12px;
-  }
-  .nav-btn.active { color: var(--accent); transform: scale(1.1); }
-  .nav-icon { font-size: 20px; line-height: 1; }
-
-  /* Modal */
-  .modal-overlay {
-    position: fixed; inset: 0; z-index: 100;
-    background: rgba(15,23,42,0.5);
-    backdrop-filter: blur(8px);
-    display: flex; align-items: flex-end; justify-content: center;
-    padding: 20px;
-    animation: fadeIn 0.2s ease;
-  }
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-  .modal {
-    background: white;
-    border-radius: 32px 32px 24px 24px;
-    padding: 32px 28px;
-    width: 100%; max-width: 420px;
-    animation: slideUp 0.25s cubic-bezier(0.34,1.56,0.64,1);
-    padding-bottom: calc(32px + env(safe-area-inset-bottom));
-  }
-  @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-  .modal h3 { font-size: 20px; font-weight: 900; text-align: center; margin-bottom: 24px; }
-
-  /* Tab switcher */
-  .tab-switch {
-    display: flex; background: var(--bg);
-    border-radius: 14px; padding: 4px; margin-bottom: 20px; gap: 2px;
-  }
-  .tab-switch button {
-    flex: 1; background: none; border: none;
-    font-family: inherit; font-size: 11px; font-weight: 900;
-    padding: 8px 4px; border-radius: 10px;
-    cursor: pointer; color: var(--text2); transition: all 0.15s;
-  }
-  .tab-switch button.active { background: white; color: var(--accent); box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-
-  /* Input */
-  .field { margin-bottom: 14px; }
-  .field label { font-size: 11px; font-weight: 900; color: var(--text2); display: block; margin-bottom: 6px; letter-spacing: 0.5px; text-transform: uppercase; }
-  .field input {
-    width: 100%; background: var(--bg); border: none;
-    border-radius: 14px; padding: 14px 16px;
-    font-family: inherit; font-size: 15px; font-weight: 700;
-    color: var(--text); outline: none;
-  }
-  .field input:focus { box-shadow: 0 0 0 2px var(--accent); }
-
-  .btn-primary {
-    width: 100%; background: var(--accent); color: white;
-    border: none; border-radius: 16px; padding: 16px;
-    font-family: inherit; font-size: 16px; font-weight: 900;
-    cursor: pointer; box-shadow: 0 4px 16px rgba(37,99,235,0.3);
-    margin-top: 8px; transition: all 0.15s;
-  }
-  .btn-primary:active { transform: scale(0.98); }
-  .btn-ghost {
-    width: 100%; background: none; color: var(--text2);
-    border: none; padding: 14px;
-    font-family: inherit; font-size: 14px; font-weight: 700;
-    cursor: pointer; margin-top: 4px;
-  }
-
-  /* Edit modal big input */
-  .big-input {
-    width: 100%; background: var(--bg); border: none;
-    border-radius: 20px; padding: 24px;
-    font-family: 'DM Mono', monospace; font-size: 32px;
-    font-weight: 500; color: var(--accent);
-    text-align: center; outline: none;
-    box-shadow: 0 0 0 2px var(--border);
-  }
-  .big-input:focus { box-shadow: 0 0 0 2px var(--accent); }
-
-  .spinning { animation: spin 1s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* Install banner */
-  .install-banner {
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    border-radius: 20px; padding: 16px 20px;
-    margin-bottom: 20px; color: white;
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .install-banner p { font-size: 12px; font-weight: 700; line-height: 1.5; }
-  .install-banner strong { display: block; font-size: 14px; }
-  .install-close { background: rgba(255,255,255,0.2); border: none; border-radius: 10px; color: white; padding: 6px 10px; cursor: pointer; font-size: 12px; font-weight: 700; white-space: nowrap; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>資產管理 Pro</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@0.321.0/dist/umd/lucide.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #f8fafc;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .glass { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+        input, select { outline: none; transition: all 0.2s; }
+        input:focus { ring: 2px; ring-color: #3b82f6; }
+    </style>
 </head>
-<body>
+<body class="text-slate-900">
 
-<div id="app">
-  <!-- Header -->
-  <div class="header">
-    <div class="header-inner">
-      <div class="header-left">
-        <button class="back-btn" id="backBtn" style="display:none" onclick="goHome()">←</button>
-        <h1 id="pageTitle">我的資產</h1>
-      </div>
-      <div class="header-actions">
-        <button class="icon-btn" onclick="toggleHide()" id="hideBtn" title="隱藏金額">👁</button>
-        <button class="icon-btn primary" onclick="openAddModal()">＋</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Main -->
-  <div class="main" id="mainContent"></div>
-
-  <!-- Bottom Nav -->
-  <div class="bottom-nav">
-    <button class="nav-btn active" id="nav-home" onclick="setTab('home')">
-      <span class="nav-icon">🏠</span>總覽
-    </button>
-    <button class="nav-btn" id="nav-tw_stock" onclick="setTab('tw_stock')">
-      <span class="nav-icon">📈</span>台股
-    </button>
-    <button class="nav-btn" id="nav-us_stock" onclick="setTab('us_stock')">
-      <span class="nav-icon">🌐</span>美股
-    </button>
-    <button class="nav-btn" id="nav-crypto" onclick="setTab('crypto')">
-      <span class="nav-icon">₿</span>幣圈
-    </button>
-    <button class="nav-btn" id="nav-bank" onclick="setTab('bank')">
-      <span class="nav-icon">🏦</span>銀行
-    </button>
-  </div>
-
-  <!-- Add Modal -->
-  <div class="modal-overlay" id="addModal" style="display:none">
-    <div class="modal">
-      <h3>新增項目</h3>
-      <div class="tab-switch" id="typeSwitch">
-        <button class="active" onclick="switchType('tw_stock',this)">台股</button>
-        <button onclick="switchType('us_stock',this)">美股</button>
-        <button onclick="switchType('crypto',this)">幣圈</button>
-        <button onclick="switchType('bank',this)">銀行</button>
-      </div>
-      <div class="field"><label>名稱</label><input id="f-name" placeholder="例：台積電 / Apple / BTC"></div>
-      <div class="field" id="f-symbol-wrap"><label>代號 (選填)</label><input id="f-symbol" placeholder="例：2330 / AAPL / BTC"></div>
-      <div class="field" id="f-qty-wrap"><label>持有數量 (股/顆)</label><input id="f-quantity" type="number" step="any" placeholder="0"></div>
-      <div class="field" id="f-price-wrap"><label>現在單價</label><input id="f-price" type="number" step="any" placeholder="0"></div>
-      <div class="field" id="f-balance-wrap" style="display:none"><label>存款金額 (TWD)</label><input id="f-balance" type="number" step="any" placeholder="0"></div>
-      <button class="btn-primary" onclick="saveAsset()">儲存</button>
-      <button class="btn-ghost" onclick="closeAddModal()">取消</button>
-    </div>
-  </div>
-
-  <!-- Edit Modal -->
-  <div class="modal-overlay" id="editModal" style="display:none">
-    <div class="modal">
-      <h3 id="editTitle">更新資料</h3>
-      <p style="text-align:center;font-size:11px;font-weight:900;color:var(--text3);letter-spacing:2px;text-transform:uppercase;margin-bottom:20px" id="editSubtitle"></p>
-      <input class="big-input" id="editValue" type="number" step="any">
-      <div class="field" id="editPriceWrap" style="margin-top:14px">
-        <label>現在單價 (更新市價)</label>
-        <input id="editPrice" type="number" step="any" placeholder="輸入最新市價" style="background:var(--bg);border:none;border-radius:14px;padding:14px 16px;font-family:inherit;font-size:15px;font-weight:700;color:var(--text);outline:none;width:100%">
-      </div>
-      <button class="btn-primary" onclick="saveEdit()">更新</button>
-      <button class="btn-ghost" onclick="closeEditModal()">取消</button>
-    </div>
-  </div>
-</div>
-
-<script>
-// ─── State ───────────────────────────────────────────────────────────────────
-let state = {
-  assets: [],
-  history: [],
-  fxRate: 32.5,
-  hideValues: false,
-  currentTab: 'home',
-  editingId: null,
-  formType: 'tw_stock',
-  showInstallBanner: true,
-};
-
-const CAT = {
-  tw_stock: { label: '台股', icon: '📈', color: '#ecfdf5', currency: 'TWD' },
-  us_stock: { label: '美股', icon: '🌐', color: '#eff6ff', currency: 'USD' },
-  crypto:   { label: '幣圈', icon: '₿',  color: '#fffbeb', currency: 'USD' },
-  bank:     { label: '銀行', icon: '🏦', color: '#f8fafc', currency: 'TWD' },
-};
-
-// ─── Persistence ─────────────────────────────────────────────────────────────
-function save() {
-  localStorage.setItem('asset-tracker', JSON.stringify({
-    assets: state.assets,
-    history: state.history,
-    fxRate: state.fxRate,
-    hideValues: state.hideValues,
-  }));
-}
-
-function load() {
-  try {
-    const d = JSON.parse(localStorage.getItem('asset-tracker') || '{}');
-    if (d.assets) state.assets = d.assets;
-    if (d.history) state.history = d.history;
-    if (d.fxRate) state.fxRate = d.fxRate;
-    if (d.hideValues !== undefined) state.hideValues = d.hideValues;
-  } catch(e) {}
-}
-
-// ─── Calculations ─────────────────────────────────────────────────────────────
-function calcTWD(asset) {
-  const val = asset.type === 'bank'
-    ? (asset.balance || 0)
-    : (asset.lastPrice || 0) * (asset.quantity || 0);
-  const rate = asset.currency === 'USD' ? state.fxRate : 1;
-  return val * rate;
-}
-
-function totals() {
-  const res = { total: 0, tw_stock: 0, us_stock: 0, crypto: 0, bank: 0 };
-  state.assets.forEach(a => {
-    const v = calcTWD(a);
-    res.total += v;
-    res[a.type] += v;
-  });
-  return res;
-}
-
-function fmt(n) {
-  if (state.hideValues) return '••••••';
-  return '$' + Math.round(n).toLocaleString();
-}
-
-function fmtSmall(n) {
-  if (state.hideValues) return '••••';
-  return '$' + Math.round(n).toLocaleString();
-}
-
-// ─── Render ───────────────────────────────────────────────────────────────────
-function render() {
-  const tab = state.currentTab;
-  document.getElementById('backBtn').style.display = (tab === 'home' || tab === 'trends') ? 'none' : 'flex';
-  document.getElementById('pageTitle').textContent =
-    tab === 'home' ? '我的資產' :
-    tab === 'trends' ? '增長趨勢' :
-    CAT[tab]?.label || '';
-
-  // update nav
-  ['home','tw_stock','us_stock','crypto','bank'].forEach(t => {
-    const el = document.getElementById('nav-' + t);
-    if (el) el.className = 'nav-btn' + (tab === t ? ' active' : '');
-  });
-
-  const main = document.getElementById('mainContent');
-
-  if (tab === 'home') renderHome(main);
-  else if (tab === 'trends') renderTrends(main);
-  else renderList(main, tab);
-}
-
-function renderHome(el) {
-  const t = totals();
-  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-  const isStandalone = window.navigator.standalone;
-
-  const installBanner = (state.showInstallBanner && isIOS && !isStandalone) ? `
-    <div class="install-banner">
-      <p><strong>📲 加到主畫面</strong>Safari → 分享按鈕 → 加入主畫面</p>
-      <button class="install-close" onclick="state.showInstallBanner=false;render()">知道了</button>
-    </div>` : '';
-
-  el.innerHTML = `
-    ${installBanner}
-    <div class="hero">
-      <p class="hero-label">估計資產淨值 (TWD)</p>
-      <h2 class="hero-amount">${fmt(t.total)}</h2>
-      <div class="hero-footer">
-        <button class="hero-btn" onclick="setTab('trends')">📊 增長趨勢</button>
-        <span class="fx-label">匯率: ${state.fxRate.toFixed(2)}</span>
-      </div>
-    </div>
-
-    <div class="fx-row">
-      <label>USD/TWD 匯率</label>
-      <input type="number" step="0.01" value="${state.fxRate}" id="fxInput" onchange="updateFX(this.value)">
-      <span class="fx-hint">手動更新</span>
-    </div>
-
-    <div class="grid">
-      ${Object.entries(CAT).map(([key, cfg]) => `
-        <button class="cat-card" onclick="setTab('${key}')">
-          <div class="cat-icon" style="background:${cfg.color}">${cfg.icon}</div>
-          <p class="cat-label">${cfg.label}</p>
-          <h3 class="cat-amount">${fmtSmall(t[key])}</h3>
-        </button>
-      `).join('')}
-    </div>
-  `;
-}
-
-let chartInstance = null;
-function renderTrends(el) {
-  el.innerHTML = `
-    <div class="chart-card">
-      <h3>📊 資產變化歷程</h3>
-      <div class="chart-wrap">
-        ${state.history.length < 2
-          ? `<div class="empty"><div class="empty-icon">📉</div><p>尚無歷史紀錄<br>每次更新資產後會自動記錄一筆</p></div>`
-          : `<canvas id="trendChart"></canvas>`
-        }
-      </div>
-    </div>
-  `;
-  if (state.history.length >= 2) {
-    const ctx = document.getElementById('trendChart').getContext('2d');
-    if (chartInstance) chartInstance.destroy();
-    chartInstance = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: state.history.map(h => h.date),
-        datasets: [{
-          data: state.history.map(h => h.total),
-          borderColor: '#2563eb',
-          borderWidth: 3,
-          fill: true,
-          backgroundColor: 'rgba(37,99,235,0.06)',
-          tension: 0.4,
-          pointRadius: 4,
-          pointBackgroundColor: '#2563eb',
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false }, tooltip: {
-          callbacks: { label: ctx => '$' + Math.round(ctx.raw).toLocaleString() }
-        }},
-        scales: {
-          x: { grid: { display: false }, ticks: { font: { size: 11 } } },
-          y: { grid: { color: '#f1f5f9' }, ticks: { callback: v => '$' + (v/10000).toFixed(0) + 'w', font: { size: 10 } } }
-        }
-      }
-    });
-  }
-}
-
-function renderList(el, tab) {
-  const filtered = state.assets.filter(a => a.type === tab);
-  el.innerHTML = filtered.length === 0
-    ? `<div class="empty"><div class="empty-icon">${CAT[tab].icon}</div><p>還沒有 ${CAT[tab].label} 資產<br>點右上角 ＋ 新增</p></div>`
-    : filtered.map(a => {
-        const twd = calcTWD(a);
-        const isBank = a.type === 'bank';
-        const sub = isBank
-          ? `餘額: $${(a.balance||0).toLocaleString()}`
-          : `持有: ${(a.quantity||0).toLocaleString()} | 單價: ${a.currency==='USD'?'$':'NT$'}${(a.lastPrice||0).toLocaleString()}`;
-        return `
-          <div class="asset-card">
-            <div>
-              <div>
-                <span class="asset-name">${a.name}</span>
-                ${a.symbol ? `<span class="asset-symbol">${a.symbol}</span>` : ''}
-              </div>
-              <div class="asset-sub">${sub}</div>
+    <div id="app" class="min-h-screen pb-32">
+        <!-- 頂部導航 -->
+        <header class="glass border-b border-slate-100 px-6 py-4 sticky top-0 z-30">
+            <div class="max-w-md mx-auto flex justify-between items-center">
+                <h1 class="text-xl font-black text-slate-800">資產管理 Pro</h1>
+                <button id="open-modal-btn" class="bg-blue-600 text-white p-3 rounded-2xl shadow-lg active:scale-90 transition-transform">
+                    <i data-lucide="plus"></i>
+                </button>
             </div>
-            <div class="asset-right">
-              <div class="asset-twd-label">現值(台幣)</div>
-              <div class="asset-twd">${fmtSmall(twd)}</div>
-              <div class="asset-actions">
-                <button class="asset-action-btn" onclick="openEditModal('${a.id}')">✏️</button>
-                <button class="asset-action-btn del" onclick="deleteAsset('${a.id}')">🗑</button>
-              </div>
+        </header>
+
+        <main class="max-w-md mx-auto p-6">
+            <!-- 總額卡片 -->
+            <div class="bg-slate-900 rounded-[2.5rem] p-10 text-white shadow-2xl relative overflow-hidden mb-8">
+                <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-1">資產淨值估算 (TWD)</p>
+                <h2 id="total-amount" class="text-4xl font-black tracking-tighter">$0</h2>
+                <div class="absolute top-[-20%] right-[-10%] w-48 h-48 bg-blue-500/20 rounded-full blur-[60px]"></div>
             </div>
-          </div>
-        `;
-      }).join('');
-}
 
-// ─── Actions ──────────────────────────────────────────────────────────────────
-function setTab(tab) {
-  state.currentTab = tab;
-  render();
-}
+            <!-- 分類標題 -->
+            <div class="flex justify-between items-center mb-4 px-2">
+                <h3 id="list-title" class="font-black text-slate-800">所有資產</h3>
+                <span id="asset-count" class="text-[10px] bg-slate-100 text-slate-400 px-3 py-1 rounded-full font-bold">0 ITEMS</span>
+            </div>
 
-function goHome() { setTab('home'); }
+            <!-- 資產列表容器 -->
+            <div id="asset-list" class="space-y-4">
+                <!-- 動態載入 -->
+                <div class="text-center py-20 text-slate-300">
+                    <i data-lucide="inbox" class="w-12 h-12 mx-auto mb-2 opacity-20"></i>
+                    <p class="text-sm font-bold">尚無資產資料</p>
+                </div>
+            </div>
+        </main>
 
-function toggleHide() {
-  state.hideValues = !state.hideValues;
-  document.getElementById('hideBtn').textContent = state.hideValues ? '🙈' : '👁';
-  save(); render();
-}
+        <!-- 底部導航 -->
+        <nav class="fixed bottom-0 left-0 right-0 glass border-t border-slate-100 p-4 pb-8 safe-bottom flex justify-around z-40">
+            <button data-tab="all" class="nav-item flex flex-col items-center gap-1 text-blue-600 font-bold">
+                <i data-lucide="layout-grid"></i><span class="text-[10px]">全部</span>
+            </button>
+            <button data-tab="bank" class="nav-item flex flex-col items-center gap-1 text-slate-300">
+                <i data-lucide="landmark"></i><span class="text-[10px]">銀行</span>
+            </button>
+            <button data-tab="stock" class="nav-item flex flex-col items-center gap-1 text-slate-300">
+                <i data-lucide="trending-up"></i><span class="text-[10px]">證券</span>
+            </button>
+        </nav>
+    </div>
 
-function updateFX(val) {
-  const v = parseFloat(val);
-  if (!isNaN(v) && v > 0) { state.fxRate = v; save(); render(); }
-}
+    <!-- 新增資產 Modal -->
+    <div id="add-modal" class="hidden fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-slate-900/60 backdrop-blur-sm p-0 sm:p-6">
+        <div class="w-full max-w-sm bg-white rounded-t-[2.5rem] sm:rounded-[3rem] p-8 shadow-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-black text-slate-800">新增資產</h3>
+                <button id="close-modal-btn" class="text-slate-300 hover:text-slate-500"><i data-lucide="x"></i></button>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="text-[10px] font-black text-slate-400 ml-2 mb-1 block">資產種類</label>
+                    <select id="asset-type" class="w-full bg-slate-50 p-4 rounded-2xl font-bold border-2 border-transparent focus:border-blue-500 outline-none">
+                        <option value="bank">銀行帳戶 (TWD)</option>
+                        <option value="tw_stock">台股 (TWD)</option>
+                        <option value="us_stock">美股 (USD)</option>
+                        <option value="crypto">加密貨幣 (USD)</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="text-[10px] font-black text-slate-400 ml-2 mb-1 block">項目名稱</label>
+                    <input id="asset-name" placeholder="例如：中國信託 / 台積電" class="w-full bg-slate-50 p-4 rounded-2xl font-bold">
+                </div>
 
-// Add modal
-function openAddModal() {
-  state.formType = 'tw_stock';
-  document.getElementById('f-name').value = '';
-  document.getElementById('f-symbol').value = '';
-  document.getElementById('f-quantity').value = '';
-  document.getElementById('f-price').value = '';
-  document.getElementById('f-balance').value = '';
-  updateFormFields();
-  document.getElementById('addModal').style.display = 'flex';
-}
-function closeAddModal() { document.getElementById('addModal').style.display = 'none'; }
+                <!-- 只有證券才顯示的欄位 -->
+                <div id="symbol-wrapper">
+                    <label class="text-[10px] font-black text-slate-400 ml-2 mb-1 block">標的代號</label>
+                    <input id="asset-symbol" placeholder="例如：2330.TW / AAPL" class="w-full bg-slate-50 p-4 rounded-2xl font-bold uppercase">
+                </div>
 
-function switchType(t, btn) {
-  state.formType = t;
-  document.querySelectorAll('#typeSwitch button').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  updateFormFields();
-}
+                <div>
+                    <label id="value-label" class="text-[10px] font-black text-slate-400 ml-2 mb-1 block">帳戶餘額 (TWD)</label>
+                    <input id="asset-value" type="number" inputmode="decimal" placeholder="0" class="w-full bg-slate-50 p-4 rounded-2xl font-bold">
+                </div>
+                
+                <button id="save-btn" class="w-full bg-blue-600 text-white py-5 rounded-2xl font-black shadow-xl shadow-blue-200 mt-4 active:scale-95 transition-all">
+                    儲存資產
+                </button>
+            </div>
+        </div>
+    </div>
 
-function updateFormFields() {
-  const isBank = state.formType === 'bank';
-  document.getElementById('f-symbol-wrap').style.display = isBank ? 'none' : 'block';
-  document.getElementById('f-qty-wrap').style.display = isBank ? 'none' : 'block';
-  document.getElementById('f-price-wrap').style.display = isBank ? 'none' : 'block';
-  document.getElementById('f-balance-wrap').style.display = isBank ? 'block' : 'none';
-}
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-function saveAsset() {
-  const name = document.getElementById('f-name').value.trim();
-  if (!name) { alert('請輸入名稱'); return; }
-  const type = state.formType;
-  const isBank = type === 'bank';
-  const asset = {
-    id: Date.now().toString(),
-    type, name,
-    symbol: document.getElementById('f-symbol').value.trim().toUpperCase(),
-    currency: CAT[type].currency,
-    lastPrice: isBank ? 0 : parseFloat(document.getElementById('f-price').value) || 0,
-    quantity: isBank ? 0 : parseFloat(document.getElementById('f-quantity').value) || 0,
-    balance: isBank ? parseFloat(document.getElementById('f-balance').value) || 0 : 0,
-  };
-  state.assets.push(asset);
-  recordHistory();
-  save();
-  closeAddModal();
-  setTab(type);
-}
+        // --- 初始化安全檢查 ---
+        let db, auth, user;
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-asset-app';
+        let assets = [];
+        let currentTab = 'all';
 
-function deleteAsset(id) {
-  if (!confirm('確定要刪除這筆資產嗎？')) return;
-  state.assets = state.assets.filter(a => a.id !== id);
-  recordHistory();
-  save(); render();
-}
+        async function initFirebase() {
+            try {
+                if (typeof __firebase_config === 'undefined') throw new Error("No Config");
+                const config = JSON.parse(__firebase_config);
+                const app = initializeApp(config);
+                auth = getAuth(app);
+                db = getFirestore(app);
 
-// Edit modal
-function openEditModal(id) {
-  const asset = state.assets.find(a => a.id === id);
-  if (!asset) return;
-  state.editingId = id;
-  const isBank = asset.type === 'bank';
-  document.getElementById('editTitle').textContent = asset.name;
-  document.getElementById('editSubtitle').textContent = isBank ? '更新存款金額' : '更新持有數量';
-  document.getElementById('editValue').value = isBank ? asset.balance : asset.quantity;
-  const priceWrap = document.getElementById('editPriceWrap');
-  if (isBank) {
-    priceWrap.style.display = 'none';
-  } else {
-    priceWrap.style.display = 'block';
-    document.getElementById('editPrice').value = asset.lastPrice || '';
-    document.getElementById('editPrice').placeholder = `目前單價: ${asset.lastPrice || 0}`;
-  }
-  document.getElementById('editModal').style.display = 'flex';
-}
-function closeEditModal() { document.getElementById('editModal').style.display = 'none'; state.editingId = null; }
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
 
-function saveEdit() {
-  const asset = state.assets.find(a => a.id === state.editingId);
-  if (!asset) return;
-  const isBank = asset.type === 'bank';
-  const val = parseFloat(document.getElementById('editValue').value) || 0;
-  if (isBank) {
-    asset.balance = val;
-  } else {
-    asset.quantity = val;
-    const newPrice = parseFloat(document.getElementById('editPrice').value);
-    if (!isNaN(newPrice) && newPrice > 0) asset.lastPrice = newPrice;
-  }
-  recordHistory();
-  save(); closeEditModal(); render();
-}
+                onAuthStateChanged(auth, (u) => {
+                    if (u) {
+                        user = u;
+                        startDataSync();
+                    }
+                });
+            } catch (e) {
+                console.warn("Firebase 初始化跳過，進入本地模式:", e.message);
+                // 這裡可以加入 localStorage 備份方案
+            }
+        }
 
-// History
-function recordHistory() {
-  const t = totals();
-  const now = new Date();
-  const date = `${now.getMonth()+1}/${now.getDate()}`;
-  state.history.push({ date, total: t.total, ts: Date.now() });
-  // keep last 90 points
-  if (state.history.length > 90) state.history = state.history.slice(-90);
-}
+        // --- 核心邏輯 ---
+        function startDataSync() {
+            if (!db || !user) return;
+            const path = collection(db, 'artifacts', appId, 'users', user.uid, 'assets');
+            onSnapshot(path, (snap) => {
+                assets = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                render();
+            }, (err) => console.error("Firestore Error:", err));
+        }
 
-// ─── Init ─────────────────────────────────────────────────────────────────────
-load();
-render();
+        function render() {
+            const list = document.getElementById('asset-list');
+            const filtered = assets.filter(a => {
+                if (currentTab === 'all') return true;
+                if (currentTab === 'bank') return a.type === 'bank';
+                if (currentTab === 'stock') return a.type !== 'bank';
+                return true;
+            });
 
-// Close modals on overlay click
-document.getElementById('addModal').addEventListener('click', function(e) {
-  if (e.target === this) closeAddModal();
-});
-document.getElementById('editModal').addEventListener('click', function(e) {
-  if (e.target === this) closeEditModal();
-});
-</script>
+            document.getElementById('asset-count').innerText = `${filtered.length} ITEMS`;
+            
+            if (filtered.length === 0) {
+                list.innerHTML = `
+                    <div class="text-center py-20 text-slate-300">
+                        <i data-lucide="inbox" class="w-12 h-12 mx-auto mb-2 opacity-20"></i>
+                        <p class="text-sm font-bold">尚無資料</p>
+                    </div>`;
+            } else {
+                list.innerHTML = '';
+                let total = 0;
+                filtered.forEach(a => {
+                    const amount = a.type === 'bank' ? a.balance : (a.quantity * (a.lastPrice || 0));
+                    total += amount;
+                    
+                    const div = document.createElement('div');
+                    div.className = "bg-white p-5 rounded-3xl border border-slate-100 flex justify-between items-center shadow-sm";
+                    div.innerHTML = `
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-2xl bg-slate-50 flex items-center justify-center text-blue-600">
+                                <i data-lucide="${a.type === 'bank' ? 'landmark' : 'trending-up'}" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-black text-slate-800">${a.name}</h4>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase">${a.type === 'bank' ? 'CASH' : a.symbol}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-black text-slate-900">$${Math.round(amount).toLocaleString()}</div>
+                            <button onclick="window.removeAsset('${a.id}')" class="text-slate-200 hover:text-red-400 transition-colors">
+                                <i data-lucide="trash-2" class="w-3 h-3"></i>
+                            </button>
+                        </div>
+                    `;
+                    list.appendChild(div);
+                });
+                document.getElementById('total-amount').innerText = `$${Math.round(total).toLocaleString()}`;
+            }
+            if (window.lucide) lucide.createIcons();
+        }
 
-<!-- PWA Service Worker -->
-<script>
-if ('serviceWorker' in navigator) {
-  const sw = `
-    const CACHE = 'asset-tracker-v1';
-    const ASSETS = ['/'];
-    self.addEventListener('install', e => {
-      e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
-    });
-    self.addEventListener('fetch', e => {
-      e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
-    });
-  `;
-  const blob = new Blob([sw], { type: 'application/javascript' });
-  const url = URL.createObjectURL(blob);
-  navigator.serviceWorker.register(url);
-}
-</script>
+        // --- 互動邏輯 ---
+        const typeSelect = document.getElementById('asset-type');
+        const symbolWrapper = document.getElementById('symbol-wrapper');
+        const valueLabel = document.getElementById('value-label');
+        const valueInput = document.getElementById('asset-value');
+
+        typeSelect.addEventListener('change', () => {
+            const type = typeSelect.value;
+            if (type === 'bank') {
+                symbolWrapper.style.display = 'none';
+                valueLabel.innerText = "帳戶餘額 (TWD)";
+                valueInput.placeholder = "請輸入目前餘額";
+            } else {
+                symbolWrapper.style.display = 'block';
+                valueLabel.innerText = "持有數量";
+                valueInput.placeholder = "例如：1000";
+            }
+        });
+
+        document.getElementById('save-btn').onclick = async () => {
+            const name = document.getElementById('asset-name').value;
+            const type = typeSelect.value;
+            const val = parseFloat(valueInput.value || 0);
+            const symbol = document.getElementById('asset-symbol').value;
+
+            if (!name) return;
+
+            if (db && user) {
+                await addDoc(collection(db, 'artifacts', appId, 'users', user.uid, 'assets'), {
+                    name, type,
+                    symbol: type === 'bank' ? '' : symbol,
+                    balance: type === 'bank' ? val : 0,
+                    quantity: type === 'bank' ? 0 : val,
+                    lastPrice: 0,
+                    createdAt: serverTimestamp()
+                });
+            }
+            toggleModal(false);
+        };
+
+        window.removeAsset = async (id) => {
+            if (confirm("確定刪除？") && db && user) {
+                await deleteDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'assets', id));
+            }
+        };
+
+        function toggleModal(show) {
+            document.getElementById('add-modal').classList.toggle('hidden', !show);
+            if (show) typeSelect.dispatchEvent(new Event('change'));
+        }
+
+        document.getElementById('open-modal-btn').onclick = () => toggleModal(true);
+        document.getElementById('close-modal-btn').onclick = () => toggleModal(false);
+
+        document.querySelectorAll('[data-tab]').forEach(btn => {
+            btn.onclick = () => {
+                currentTab = btn.dataset.tab;
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.replace('text-blue-600', 'text-slate-300'));
+                btn.classList.replace('text-slate-300', 'text-blue-600');
+                render();
+            };
+        });
+
+        // 啟動
+        initFirebase();
+        render(); // 先執行一次渲染(本地資料)
+    </script>
 </body>
 </html>
